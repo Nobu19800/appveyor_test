@@ -1,5 +1,5 @@
 version: '{build}'
-clone_folder: c:\workspace\XXX
+clone_folder: c:\workspace\appveyor_test
 platform:
 - x64
 environment:
@@ -7,7 +7,7 @@ environment:
   openrtm_version: 1.2.0
   matrix:
     - cmake_generator: Visual Studio 16 2019
-      cmake_archtecture: x86_64
+      cmake_archtecture: x64
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       python: 37-x64
 matrix:
@@ -18,10 +18,13 @@ init:
   - ps: $Env:APPVEYOR_BUILD_WORKER_IMAGE
   - ps: $Env:cmake_generator
   - ps: $Env:cmake_archtecture
+  - ps: |
+      $Env:Path = "C:\Python${Env:python};c:\Python${Env:python}\scripts;${Env:Path}"
   - python --version
 
 before_build:
   - cmake --version
+  - cmake -G "%cmake_generator%" -A "%cmake_archtecture%" -S . -B../build
 
 build_script:
   - ps: $Env:nproc = (Get-WmiObject -Class Win32_Processor).NumberOfLogicalProcessors + 1
