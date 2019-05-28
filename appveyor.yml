@@ -1,0 +1,38 @@
+version: '{build}'
+clone_folder: c:\workspace\XXX
+platform:
+- x64
+environment:
+  openrtm: OpenRTM-aist
+  openrtm_version: 1.2.0
+  matrix:
+    - cmake_generator: Visual Studio 16 2019
+      cmake_archtecture: x86_64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      python: 37-x64
+matrix:
+  fast_finish: true
+
+init:
+  - git config --global core.autocrlf false
+  - ps: $Env:APPVEYOR_BUILD_WORKER_IMAGE
+  - ps: $Env:cmake_generator
+  - ps: $Env:cmake_archtecture
+  - python --version
+
+before_build:
+  - cmake --version
+
+build_script:
+  - ps: $Env:nproc = (Get-WmiObject -Class Win32_Processor).NumberOfLogicalProcessors + 1
+  - echo cmake --build ../build -j %nproc% --config Release -- -verbosity:minimal
+  - cmake --build ../build -j %nproc% --config Release -- -verbosity:minimal
+
+
+#cache:
+#  - C:/omni -> appveyor.yml
+
+only_commits:
+  files:
+    - appveyor.yml
+    - CMakeLists.txt
